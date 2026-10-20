@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-lime-100">
+    <nav class="w-full bg-blue-300 px-6 py-4 flex justify-between items-center shadow-md">
+        <span class="font-bold text-blue-900">MyApp</span>
+        <div class="flex gap-6">
+            <a href="{% url 'register' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Register</a>
+            <!-- <a href="{% url 'about' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">About</a> -->
+        </div>
+    </nav>
+
+    <div class="flex-1 flex justify-center items-center px-4">
+        <form action="" method="post" class="flex flex-col items-center bg-blue-300 p-6 sm:p-8 rounded shadow-md w-full max-w-sm">
+            {% csrf_token %}
+            <input type="text" name="email" id="email" placeholder="Email" class="w-full p-2 mb-4 bg-blue-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out" required>
+            <input type="password" name="password" id="password" placeholder="Password" class="w-full p-2 mb-4 bg-blue-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out" required>
+            <button type="submit" class="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300 ease-in-out">Login</button>
+        </form>
+    </div>
+    <!-- change later to email -->
+
+    {% if messages %}
+    <script>
+        {% for message in messages %}
+            Swal.fire({
+                icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+                title: "{{ message|escapejs }}",
+                confirmButtonColor: "#3b82f6"
+            });
+        {% endfor %}
+    </script>
+    {% endif %}
+</body>
+</html>

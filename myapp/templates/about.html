@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-lime-100">
+    <nav class="w-full bg-blue-300 px-6 py-4 flex justify-between items-center shadow-md">
+        <span class="font-bold text-blue-900">MyApp</span>
+        <div class="flex gap-6 items-center">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Dashboard</a>
+                <span class="text-blue-900">Hi, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Login</a>
+                <a href="{% url 'register' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="flex-1 px-4 py-10 flex flex-col items-center gap-8">
+
+        <!-- Hero / welcome section -->
+        <div class="text-center max-w-xl">
+            {% if user.is_authenticated %}
+                <h1 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-2">Welcome back, {{ user.username }} 👋</h1>
+                <p class="text-blue-800">You're securely logged in to the IDS demo environment.</p>
+            {% else %}
+                <h1 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-2">Welcome</h1>
+                <p class="text-blue-800">Log in or register to explore the demo environment.</p>
+            {% endif %}
+        </div>
+
+        <!-- Project info card -->
+        <div class="bg-blue-300 p-6 sm:p-8 rounded shadow-md w-full max-w-md text-blue-900">
+            <h2 class="text-xl font-bold mb-4">About This Project</h2>
+
+            <p class="mb-4 text-sm">This application is a demo web app built to test and demonstrate an Intrusion Detection System (IDS) for web applications. It provides common attack surfaces  login and registration forms  used to showcase how the IDS detects threats like SQL injection, XSS, and brute force attempts.</p>
+
+            <div class="mb-4">
+                <h3 class="font-semibold mb-1 text-sm">Project Details</h3>
+                <ul class="text-sm space-y-1">
+                    <li><span class="font-medium">Student:</span> Goodness</li>
+                    <li><span class="font-medium">Institution:</span> Ebonyi State University, Abakaliki</li>
+                    <li><span class="font-medium">Department:</span> Computer Science, Faculty of Science</li>
+                    <li><span class="font-medium">Supervisor:</span> ......</li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-semibold mb-1 text-sm">Tech Stack</h3>
+                <ul class="text-sm space-y-1">
+                    <li>Backend: Django</li>
+                    <li>Frontend: HTML, Tailwind CSS</li>
+                    <li>IDS Engine: Custom middleware (signature + anomaly-based detection)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <script>
+        {% for message in messages %}
+            Swal.fire({
+                icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+                title: "{{ message|escapejs }}",
+                confirmButtonColor: "#3b82f6"
+            });
+        {% endfor %}
+    </script>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDS Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-lime-100">
+    <nav class="w-full bg-blue-300 px-6 py-4 flex justify-between items-center shadow-md">
+        <span class="font-bold text-blue-900">MyApp</span>
+        <div class="flex gap-6 items-center">
+            <a href="{% url 'about' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Home</a>
+            <span class="text-blue-900">Hi, {{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="text-blue-900 hover:text-blue-700 transition duration-300 ease-in-out">Logout</a>
+        </div>
+    </nav>
+
+    <div class="flex-1 px-4 py-8 max-w-5xl mx-auto w-full">
+        <h1 class="text-2xl font-bold text-blue-900 mb-6">Intrusion Detection Dashboard</h1>
+                <div class="mb-6 flex items-center gap-4">
+            <span class="text-blue-900 font-medium">
+                IDS Status:
+                {% if ids_active %}
+                    <span class="text-green-700 font-bold">ACTIVE</span>
+                {% else %}
+                    <span class="text-red-700 font-bold">INACTIVE</span>
+                {% endif %}
+            </span>
+            <form action="{% url 'toggle_ids' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 rounded text-white font-medium transition duration-300 ease-in-out
+                    {% if ids_active %} bg-red-500 hover:bg-red-600 {% else %} bg-green-500 hover:bg-green-600 {% endif %}">
+                    {% if ids_active %} Turn OFF {% else %} Turn ON {% endif %}
+                </button>
+            </form>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
+            <div class="bg-blue-300 p-4 rounded shadow text-center">
+                <p class="text-2xl font-bold text-blue-900">{{ total_attacks }}</p>
+                <p class="text-sm text-blue-800">Total Attacks</p>
+            </div>
+            <div class="bg-red-200 p-4 rounded shadow text-center">
+                <p class="text-2xl font-bold text-red-800">{{ sqli_count }}</p>
+                <p class="text-sm text-red-700">SQL Injection</p>
+            </div>
+            <div class="bg-yellow-200 p-4 rounded shadow text-center">
+                <p class="text-2xl font-bold text-yellow-800">{{ xss_count }}</p>
+                <p class="text-sm text-yellow-700">XSS</p>
+            </div>
+            <div class="bg-orange-200 p-4 rounded shadow text-center">
+                <p class="text-2xl font-bold text-orange-800">{{ brute_force_count }}</p>
+                <p class="text-sm text-orange-700">Brute Force</p>
+            </div>
+            <div class="bg-purple-200 p-4 rounded shadow text-center">
+                <p class="text-2xl font-bold text-purple-800">{{ path_traversal_count }}</p>
+                <p class="text-sm text-purple-700">Path Traversal</p>
+            </div>
+        </div>
+
+        <!-- Logs table -->
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-blue-300 text-blue-900">
+                    <tr>
+                        <th class="px-4 py-3">Time</th>
+                        <th class="px-4 py-3">IP Address</th>
+                        <th class="px-4 py-3">Attack Type</th>
+                        <th class="px-4 py-3">Path</th>
+                        <th class="px-4 py-3">Payload</th>
+                        <th class="px-4 py-3">Blocked</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr class="border-b hover:bg-lime-50">
+                        <td class="px-4 py-2 whitespace-nowrap">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                        <td class="px-4 py-2">{{ log.ip_address }}</td>
+                        <td class="px-4 py-2">
+                            <span class="px-2 py-1 rounded text-xs font-medium
+                                {% if log.attack_type == 'sqli' %} bg-red-200 text-red-800
+                                {% elif log.attack_type == 'xss' %} bg-yellow-200 text-yellow-800
+                                {% elif log.attack_type == 'brute_force' %} bg-orange-200 text-orange-800
+                                {% else %} bg-purple-200 text-purple-800
+                                {% endif %}">
+                                {{ log.get_attack_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">{{ log.path }}</td>
+                        <td class="px-4 py-2 max-w-xs truncate" title="{{ log.payload }}">{{ log.payload }}</td>
+                        <td class="px-4 py-2">
+                            {% if log.blocked %}
+                                <span class="text-green-700 font-medium">Yes</span>
+                            {% else %}
+                                <span class="text-red-700 font-medium">No</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">No intrusions detected yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
